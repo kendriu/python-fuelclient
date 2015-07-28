@@ -18,6 +18,7 @@ from fuelclient.cli.actions.base import Action
 import fuelclient.cli.arguments as Args
 from fuelclient.cli.arguments import group
 from fuelclient.objects.environment import Environment
+from fuelclient.objects.plugins import master_only
 from fuelclient.utils import exec_cmd
 
 DHCP_TEMPLATE_PATH = '/etc/cobbler/dnsmasq.template'
@@ -81,6 +82,7 @@ class NetworkAction(Action):
         if params.dnsmasq:
             self._update_dnsmasq_template(network_data['networks'])
 
+    @master_only
     def _update_dnsmasq_template(self, networks):
         fw_admin_nets = dict([(n['group_id'], n) for n in networks if
                               n['name'] == 'fuelweb_admin'])
