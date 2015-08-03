@@ -17,7 +17,6 @@ import os
 import shutil
 import sys
 import tarfile
-
 from distutils.version import StrictVersion
 
 import six
@@ -26,33 +25,10 @@ import yaml
 from fuelclient.cli import error
 from fuelclient.objects import base
 from fuelclient import utils
-
+from fuelclient.utils import master_only
 
 PLUGINS_PATH = '/var/www/nailgun/plugins/'
 METADATA_MASK = '/var/www/nailgun/plugins/*/metadata.yaml'
-VERSIONS_PATH = '/etc/fuel/version.yaml'
-
-
-def raise_error_if_not_master():
-    """Raises error if it's not Fuel master
-
-    :raises: error.WrongEnvironmentError
-    """
-    if not os.path.exists(VERSIONS_PATH):
-        raise error.WrongEnvironmentError(
-            'Action can be performed from Fuel master node only.')
-
-
-def master_only(f):
-    """Decorator for the method, which raises error, if method
-    is called on the node which is not Fuel master
-    """
-    @six.wraps(f)
-    def print_message(*args, **kwargs):
-        raise_error_if_not_master()
-        return f(*args, **kwargs)
-
-    return print_message
 
 
 @six.add_metaclass(abc.ABCMeta)

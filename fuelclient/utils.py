@@ -18,12 +18,16 @@ import glob
 import io
 import os
 import subprocess
+import six
 import yaml
 
 from distutils.version import StrictVersion
 from fnmatch import fnmatch
 
 from fuelclient.cli import error
+
+
+VERSIONS_PATH = '/etc/fuel/version.yaml'
 
 
 def _wait_and_check_exit_code(cmd, child):
@@ -129,3 +133,25 @@ def file_exists(path):
     :returns: True if file is exist, Flase if is not
     """
     return os.path.lexists(path)
+
+
+def master_only(f):
+    """Decorator for the method, which raises error, if method
+    is called on the node which is not Fuel master
+    """
+    @six.wraps(f)
+    def print_message(*args, **kwargs):
+        raise_error_if_not_master()
+        return f(*args, **kwargs)
+
+    return print_message
+
+
+def raise_error_if_not_master():
+    """Raises error if it's not Fuel master
+
+    :raises: error.WrongEnvironmentError
+    """
+    if not os.path.exists(VERSIONS_PATH):
+        raise error.WrongEnvironmentError(
+            'Action can be performed from Fuel master node only.')

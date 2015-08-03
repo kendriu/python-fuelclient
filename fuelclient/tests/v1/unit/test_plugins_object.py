@@ -26,7 +26,7 @@ from fuelclient.objects.plugins import PluginV2
 from fuelclient.tests import base
 
 
-@patch('fuelclient.objects.plugins.raise_error_if_not_master')
+@patch('fuelclient.utils.raise_error_if_not_master')
 class TestPluginV1(base.UnitTestCase):
 
     fake_meta = """

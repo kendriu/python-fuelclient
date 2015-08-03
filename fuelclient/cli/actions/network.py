@@ -13,13 +13,13 @@
 #    under the License.
 
 import netaddr
+
 from fuelclient.cli import error
 from fuelclient.cli.actions.base import Action
 import fuelclient.cli.arguments as Args
 from fuelclient.cli.arguments import group
 from fuelclient.objects.environment import Environment
-from fuelclient.objects.plugins import master_only
-from fuelclient.utils import exec_cmd
+from fuelclient.utils import exec_cmd, master_only
 
 DHCP_TEMPLATE_PATH = '/etc/cobbler/dnsmasq.template'
 
@@ -31,7 +31,9 @@ DNSMASQ_ENTRY_TEMPLATE = '\\n' + GROUP_ID_TEMPLATE + (
     'dhcp-option=net:internal{group_id},option:router,{gateway}\\n'
     'dhcp-boot=net:internal{group_id},pxelinux.0,boothost,{boothost}')
 
-COBBLER_SHELL = 'dockerctl shell cobbler '
+
+def exec_cmd_on_cobbler(cmd, cwd=None):
+    exec_cmd('dockerctl shell cobbler ' + cmd, cwd)
 
 
 class NetworkAction(Action):
@@ -88,13 +90,13 @@ class NetworkAction(Action):
                               n['name'] == 'fuelweb_admin'])
         base_net = fw_admin_nets.pop(None)
         for group_id, net in fw_admin_nets.iteritems():
-            marker = GROUP_ID_TEMPLATE.format(group_id = group_id)
+            marker = GROUP_ID_TEMPLATE.format(group_id=group_id)
             try:
-                exec_cmd(COBBLER_SHELL + 'grep -q "%s" %s' % (
+                exec_cmd_on_cobbler('grep -q "{0}" {1}'.format(
                     marker, DHCP_TEMPLATE_PATH
                 ))
             except error.ExecutedErrorNonZeroExitCode:
-                # network is not  in dnsmasq.template yet
+                # network is not in dnsmasq.template yet
                 ip_range = net['ip_ranges'][0]
                 entry = DNSMASQ_ENTRY_TEMPLATE.format(
                     group_id=group_id,
@@ -104,12 +106,12 @@ class NetworkAction(Action):
                     gateway=net['gateway'],
                     boothost=base_net['gateway']
                 )
-                exec_cmd(COBBLER_SHELL + "sed -r '$a \%s' -i %s;" % (
+                exec_cmd_on_cobbler("sed -r '$a \{0}' -i {1};".format(
                     entry, DHCP_TEMPLATE_PATH))
 
-        exec_cmd(COBBLER_SHELL + 'cobbler sync > /dev/null 2>&1')
+        exec_cmd_on_cobbler('cobbler sync > /dev/null 2>&1')
         print (
-            "Updated %s and synced cobbler." % DHCP_TEMPLATE_PATH
+            "Updated {0} and synced cobbler.".format(DHCP_TEMPLATE_PATH)
         )
 
     def verify(self, params):
