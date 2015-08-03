@@ -14,18 +14,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from distutils.version import StrictVersion
+from fnmatch import fnmatch
 import glob
 import io
 import os
 import subprocess
+
 import six
 import yaml
 
-from distutils.version import StrictVersion
-from fnmatch import fnmatch
-
 from fuelclient.cli import error
-
 
 VERSIONS_PATH = '/etc/fuel/version.yaml'
 

@@ -101,7 +101,7 @@ class TestPluginV1(base.UnitTestCase):
             self.version)
 
 
-@patch('fuelclient.objects.plugins.raise_error_if_not_master')
+@patch('fuelclient.utils.raise_error_if_not_master')
 class TestPluginV2(base.UnitTestCase):
 
     def setUp(self):

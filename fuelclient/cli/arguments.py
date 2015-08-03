@@ -375,6 +375,7 @@ def get_create_arg(help_msg):
 def get_download_arg(help_msg):
     return get_boolean_arg("download", flags=("-d",), help=help_msg)
 
+
 def get_dnsmasq_arg(help_msg):
     return get_boolean_arg("dnsmasq", help=help_msg)
 

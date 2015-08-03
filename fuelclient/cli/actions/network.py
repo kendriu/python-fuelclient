@@ -14,12 +14,12 @@
 
 import netaddr
 
-from fuelclient.cli import error
 from fuelclient.cli.actions.base import Action
-import fuelclient.cli.arguments as Args
+from fuelclient.cli import arguments as Args
 from fuelclient.cli.arguments import group
+from fuelclient.cli import error
 from fuelclient.objects.environment import Environment
-from fuelclient.utils import exec_cmd, master_only
+from fuelclient import utils
 
 DHCP_TEMPLATE_PATH = '/etc/cobbler/dnsmasq.template'
 
@@ -33,7 +33,7 @@ DNSMASQ_ENTRY_TEMPLATE = '\\n' + GROUP_ID_TEMPLATE + (
 
 
 def exec_cmd_on_cobbler(cmd, cwd=None):
-    exec_cmd('dockerctl shell cobbler ' + cmd, cwd)
+    utils.exec_cmd('dockerctl shell cobbler ' + cmd, cwd)
 
 
 class NetworkAction(Action):
@@ -84,7 +84,7 @@ class NetworkAction(Action):
         if params.dnsmasq:
             self._update_dnsmasq_template(network_data['networks'])
 
-    @master_only
+    @utils.master_only
     def _update_dnsmasq_template(self, networks):
         fw_admin_nets = dict([(n['group_id'], n) for n in networks if
                               n['name'] == 'fuelweb_admin'])

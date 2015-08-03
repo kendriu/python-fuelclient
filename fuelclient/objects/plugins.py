@@ -13,11 +13,11 @@
 #    under the License.
 
 import abc
+from distutils.version import StrictVersion
 import os
 import shutil
 import sys
 import tarfile
-from distutils.version import StrictVersion
 
 import six
 import yaml
@@ -25,7 +25,6 @@ import yaml
 from fuelclient.cli import error
 from fuelclient.objects import base
 from fuelclient import utils
-from fuelclient.utils import master_only
 
 PLUGINS_PATH = '/var/www/nailgun/plugins/'
 METADATA_MASK = '/var/www/nailgun/plugins/*/metadata.yaml'
@@ -84,7 +83,7 @@ class PluginV1(BasePlugin):
         return print_message
 
     @classmethod
-    @master_only
+    @utils.master_only
     @deprecated
     def install(cls, plugin_path, force=False):
         plugin_tar = tarfile.open(plugin_path, 'r')
@@ -94,7 +93,7 @@ class PluginV1(BasePlugin):
             plugin_tar.close()
 
     @classmethod
-    @master_only
+    @utils.master_only
     @deprecated
     def remove(cls, plugin_name, plugin_version):
         plugin_path = os.path.join(
@@ -154,7 +153,7 @@ class PluginV1(BasePlugin):
 class PluginV2(BasePlugin):
 
     @classmethod
-    @master_only
+    @utils.master_only
     def install(cls, plugin_path, force=False):
         if force:
             utils.exec_cmd(
@@ -164,18 +163,18 @@ class PluginV2(BasePlugin):
             utils.exec_cmd('yum -y install {0}'.format(plugin_path))
 
     @classmethod
-    @master_only
+    @utils.master_only
     def remove(cls, name, version):
         rpm_name = '{0}-{1}'.format(name, utils.major_plugin_version(version))
         utils.exec_cmd('yum -y remove {0}'.format(rpm_name))
 
     @classmethod
-    @master_only
+    @utils.master_only
     def update(cls, plugin_path):
         utils.exec_cmd('yum -y update {0}'.format(plugin_path))
 
     @classmethod
-    @master_only
+    @utils.master_only
     def downgrade(cls, plugin_path):
         utils.exec_cmd('yum -y downgrade {0}'.format(plugin_path))
 
